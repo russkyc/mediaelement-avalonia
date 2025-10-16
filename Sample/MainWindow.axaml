@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sample="clr-namespace:Sample"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Sample.MainWindow"
+        x:DataType="sample:MainViewModel"
+        Title="Sample">
+    <Grid>
+        <TransitioningContentControl Content="{Binding FramePlayer}">
+            <TransitioningContentControl.PageTransition>
+                <CrossFade Duration="0:0:5"/>
+            </TransitioningContentControl.PageTransition>
+            <TransitioningContentControl.ContentTemplate>
+                <DataTemplate DataType="sample:MediaFramePlayer">
+                    <Viewbox>
+                        <Grid
+                            Width="1920"
+                            Height="1080">
+                            <Image Source="{Binding CurrentFrame, Priority=Animation}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                                   RenderOptions.BitmapInterpolationMode="HighQuality" />
+                            <TextBlock Text="Test Overlay" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="White" FontSize="64"/>
+                        </Grid>
+                    </Viewbox>
+                </DataTemplate>
+            </TransitioningContentControl.ContentTemplate>
+        </TransitioningContentControl>
+    </Grid>
+</Window>

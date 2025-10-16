@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="Russkyc.FFPlayer.Avalonia.Sample/MainWindow.axaml" value="Russkyc.FFPlayer.Avalonia.Sample/Russkyc.FFPlayer.Avalonia.Sample.csproj" />
+        <entry key="Russkyc.FFPlayer.Avalonia/MediaPlayer.axaml" value="Sample/Sample.csproj" />
+        <entry key="Russkyc.FFPlayer.Avalonia/MediaPlayerView.axaml" value="Sample/Sample.csproj" />
+        <entry key="Sample/App.axaml" value="Sample/Sample.csproj" />
+        <entry key="Sample/MainWindow.axaml" value="Sample/Sample.csproj" />
+      </map>
+    </option>
+  </component>
+</project>
