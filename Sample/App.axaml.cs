@@ -17,7 +17,7 @@ public partial class App : Application
     {
         Core.Initialize();
         
-        LibVlc = new LibVLC("--avcodec-threads=4");
+        LibVlc = new LibVLC("--avcodec-hw=none --vout=dummy");
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var vm = new MainViewModel();
@@ -25,11 +25,6 @@ public partial class App : Application
             {
                 DataContext = vm
             };
-            var window = new MainWindow()
-            {
-                DataContext = vm
-            };
-            window.Show();
         }
 
         base.OnFrameworkInitializationCompleted();

@@ -22,6 +22,9 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     private uint _videoHeight;
     private uint _videoPitch;
     private bool _isDisposed;
+    private Thread? _playerThread;
+    private string? _mediaPath;
+    private ManualResetEventSlim _stopEvent = new();
     
     #endregion
 
@@ -64,12 +67,12 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
 
     #region Public Methods
     
-    public void Play(string mediaPath)
+    public void Play(string mediaPath, bool loop = false)
     {
         if (_isDisposed)
             throw new ObjectDisposedException(nameof(MediaFramePlayer));
         
-        var media = new Media(App.LibVlc, mediaPath);
+        var media = new Media(App.LibVlc, mediaPath, options: loop ? "input-repeat=65535" : string.Empty);
         _player.Play(media);
     }
 
@@ -81,6 +84,38 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     public void Pause()
     {
         _player.Pause();
+    }
+
+    public void PlayOnThread(string mediaPath, bool loop = false)
+    {
+        if (_isDisposed)
+            throw new ObjectDisposedException(nameof(MediaFramePlayer));
+        _mediaPath = mediaPath;
+        _stopEvent.Reset();
+        _playerThread = new Thread(() => PlayerThreadProc(loop))
+        {
+            IsBackground = true
+        };
+        _playerThread.Start();
+    }
+    
+    private void PlayerThreadProc(bool loop = false)
+    {
+        var media = new Media(App.LibVlc, _mediaPath, options: loop ? "input-repeat=65535" : string.Empty);
+        _player.Play(media);
+        while (!_stopEvent.Wait(100))
+        {
+            // Thread stays alive while playing
+            if (_isDisposed) break;
+        }
+    }
+
+    public void StopThreaded()
+    {
+        _stopEvent.Set();
+        _player.Stop();
+        if (_playerThread != null && _playerThread.IsAlive)
+            _playerThread.Join();
     }
     
     #endregion
@@ -114,7 +149,6 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     private void AllocateVideoBuffer()
     {
         var bufferSize = GetBufferSize();
-        
         lock (_bufferLock)
         {
             FreeVideoBuffer();
@@ -170,22 +204,20 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
 
     private IntPtr CopyFrameData()
     {
-        var bufferSize = GetBufferSize();
-        var tempBuffer = Marshal.AllocHGlobal(bufferSize);
-
         lock (_bufferLock)
         {
+            var bufferSize = GetBufferSize();
+            var frameBuffer = Marshal.AllocHGlobal(bufferSize);
             unsafe
             {
                 Buffer.MemoryCopy(
                     _videoBuffer.ToPointer(),
-                    tempBuffer.ToPointer(),
+                    frameBuffer.ToPointer(),
                     bufferSize,
                     bufferSize);
             }
+            return frameBuffer;
         }
-
-        return tempBuffer;
     }
 
     private void UpdateFrameOnUiThread(IntPtr frameBuffer)
@@ -206,11 +238,14 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
 
     private void CopyFrameToWriteableBitmap(IntPtr sourceBuffer)
     {
-        if (CurrentFrame == null) return;
-
         var bufferSize = GetBufferSize();
-        var bitmap = new WriteableBitmap(CurrentFrame.PixelSize, CurrentFrame.Dpi, CurrentFrame.Format,
-            CurrentFrame.AlphaFormat);
+        var width = (int)(_videoPitch / 4);
+        var height = (int)_videoHeight;
+        var bitmap = new WriteableBitmap(
+            new Avalonia.PixelSize(width, height),
+            new Avalonia.Vector(96, 96),
+            PixelFormat.Bgra8888,
+            AlphaFormat.Opaque);
         using var frameBuffer = bitmap.Lock();
         unsafe
         {
@@ -253,15 +288,12 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     public void Dispose()
     {
         if (_isDisposed) return;
-        
-        _player.Stop();
+        StopThreaded();
         _player.Dispose();
-        
         lock (_bufferLock)
         {
             FreeVideoBuffer();
         }
-        
         _isDisposed = true;
         GC.SuppressFinalize(this);
     }

@@ -1,5 +1,4 @@
 ﻿using System;
-using Avalonia.Controls.Shapes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FluentScheduler;
 using Path = System.IO.Path;
@@ -18,7 +17,7 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnFramePlayerChanged(MediaFramePlayer? oldValue, MediaFramePlayer? newValue)
     {
-        JobManager.AddJob(() => oldValue?.Dispose(), s => s.ToRunOnceIn(5).Seconds());
+        JobManager.AddJob(() => oldValue?.Dispose(), s => s.ToRunOnceIn(4).Seconds());
     }
 
     private void OnSwitch()
@@ -26,14 +25,14 @@ public partial class MainViewModel : ObservableObject
         if (Index == 0)
         {
             var framePlayer = new MediaFramePlayer();
-            framePlayer.Play(Path.Combine(Environment.CurrentDirectory, "1.mp4"));
+            framePlayer.PlayOnThread(Path.Combine(Environment.CurrentDirectory, "1.mp4"));
             FramePlayer = framePlayer;
             Index = 1;
         }
         else
         {
             var framePlayer = new MediaFramePlayer();
-            framePlayer.Play(Path.Combine(Environment.CurrentDirectory, "2.mp4"));
+            framePlayer.PlayOnThread(Path.Combine(Environment.CurrentDirectory, "2.mp4"));
             FramePlayer = framePlayer;
             Index = 0;
         }

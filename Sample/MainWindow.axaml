@@ -8,23 +8,21 @@
         x:DataType="sample:MainViewModel"
         Title="Sample">
     <Grid>
-        <TransitioningContentControl Content="{Binding FramePlayer}">
-            <TransitioningContentControl.PageTransition>
-                <CrossFade Duration="0:0:5"/>
-            </TransitioningContentControl.PageTransition>
-            <TransitioningContentControl.ContentTemplate>
-                <DataTemplate DataType="sample:MediaFramePlayer">
-                    <Viewbox>
-                        <Grid
-                            Width="1920"
-                            Height="1080">
-                            <Image Source="{Binding CurrentFrame, Priority=Animation}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                                   RenderOptions.BitmapInterpolationMode="HighQuality" />
-                            <TextBlock Text="Test Overlay" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" Foreground="White" FontSize="64"/>
-                        </Grid>
-                    </Viewbox>
-                </DataTemplate>
-            </TransitioningContentControl.ContentTemplate>
-        </TransitioningContentControl>
+        <Viewbox>
+            <TransitioningContentControl Content="{Binding FramePlayer}">
+                <TransitioningContentControl.PageTransition>
+                    <CrossFade Duration="0:0:4"/>
+                </TransitioningContentControl.PageTransition>
+                <TransitioningContentControl.ContentTemplate>
+                    <DataTemplate DataType="sample:MediaFramePlayer">
+                        <Image Width="1920" Height="1080" Source="{Binding CurrentFrame, Priority=Animation}"
+                               VerticalAlignment="Stretch" HorizontalAlignment="Stretch" UseLayoutRounding="True"
+                               RenderOptions.BitmapInterpolationMode="HighQuality" />
+                    </DataTemplate>
+                </TransitioningContentControl.ContentTemplate>
+            </TransitioningContentControl>
+        </Viewbox>
+        <TextBlock Text="Test Overlay" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"
+                   Foreground="White" FontSize="64" />
     </Grid>
 </Window>

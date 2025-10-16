@@ -19,7 +19,7 @@ static class Program
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
-            .With(new SkiaOptions() { MaxGpuResourceSizeBytes = 256000000, UseOpacitySaveLayer = true})
+            .With(new SkiaOptions() { MaxGpuResourceSizeBytes = 512000000})
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();
