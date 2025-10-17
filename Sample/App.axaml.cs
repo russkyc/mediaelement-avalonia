@@ -17,7 +17,7 @@ public partial class App : Application
     {
         Core.Initialize();
         
-        LibVlc = new LibVLC("--avcodec-hw=none --vout=dummy");
+        LibVlc = new LibVLC("--vout=dummy");
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var vm = new MainViewModel();

@@ -12,11 +12,9 @@ namespace Sample;
 
 public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
 {
-    #region Fields
-    
+    // Fields
     private readonly MediaPlayer _player;
     private readonly Lock _bufferLock = new();
-    
     private WriteableBitmap? _currentFrame;
     private IntPtr _videoBuffer = IntPtr.Zero;
     private uint _videoHeight;
@@ -25,11 +23,8 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     private Thread? _playerThread;
     private string? _mediaPath;
     private ManualResetEventSlim _stopEvent = new();
-    
-    #endregion
 
-    #region Properties
-    
+    // Properties
     public WriteableBitmap? CurrentFrame
     {
         get => _currentFrame;
@@ -39,96 +34,78 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
             OnPropertyChanged();
         }
     }
-    
-    #endregion
 
-    #region Events
-    
+    // Events
     public event PropertyChangedEventHandler? PropertyChanged;
-    
-    #endregion
 
-    #region Initialization
-    
+    // Constructor
     public MediaFramePlayer()
     {
         _player = new MediaPlayer(App.LibVlc);
-        
         ConfigureVideoCallbacks();
     }
 
-    private void ConfigureVideoCallbacks()
+    ~MediaFramePlayer()
     {
-        _player.SetVideoFormatCallbacks(VideoFormat, CleanupVideo);
-        _player.SetVideoCallbacks(LockVideo, null, DisplayVideo);
+        Dispose();
     }
-    
-    #endregion
 
-    #region Public Methods
-    
+    // Public Methods
     public void Play(string mediaPath, bool loop = false)
     {
-        if (_isDisposed)
-            throw new ObjectDisposedException(nameof(MediaFramePlayer));
-        
-        var media = new Media(App.LibVlc, mediaPath, options: loop ? "input-repeat=65535" : string.Empty);
+        EnsureNotDisposed();
+        var media = CreateMedia(mediaPath, loop);
         _player.Play(media);
     }
 
-    public void Stop()
-    {
-        _player.Stop();
-    }
+    public void Stop() => _player.Stop();
 
-    public void Pause()
-    {
-        _player.Pause();
-    }
+    public void Pause() => _player.Pause();
 
     public void PlayOnThread(string mediaPath, bool loop = false)
     {
-        if (_isDisposed)
-            throw new ObjectDisposedException(nameof(MediaFramePlayer));
+        EnsureNotDisposed();
         _mediaPath = mediaPath;
         _stopEvent.Reset();
-        _playerThread = new Thread(() => PlayerThreadProc(loop))
-        {
-            IsBackground = true
-        };
+        _playerThread = new Thread(() => PlayerThreadProc(loop)) { IsBackground = true };
         _playerThread.Start();
-    }
-    
-    private void PlayerThreadProc(bool loop = false)
-    {
-        var media = new Media(App.LibVlc, _mediaPath, options: loop ? "input-repeat=65535" : string.Empty);
-        _player.Play(media);
-        while (!_stopEvent.Wait(100))
-        {
-            // Thread stays alive while playing
-            if (_isDisposed) break;
-        }
     }
 
     public void StopThreaded()
     {
         _stopEvent.Set();
         _player.Stop();
-        if (_playerThread != null && _playerThread.IsAlive)
-            _playerThread.Join();
+        _playerThread?.Join();
     }
-    
-    #endregion
 
-    #region Video Callbacks
-    
-    private uint VideoFormat(ref IntPtr opaque, IntPtr chroma, ref uint width, ref uint height, 
-        ref uint pitches, ref uint lines)
+    // Private Methods
+    private void ConfigureVideoCallbacks()
+    {
+        _player.SetVideoFormatCallbacks(VideoFormat, CleanupVideo);
+        _player.SetVideoCallbacks(LockVideo, null, DisplayVideo);
+    }
+
+    private void PlayerThreadProc(bool loop)
+    {
+        if (_mediaPath is null) return;
+        var media = CreateMedia(_mediaPath, loop);
+        _player.Play(media);
+        while (!_stopEvent.Wait(100))
+        {
+            if (_isDisposed) break;
+        }
+    }
+
+    private Media CreateMedia(string mediaPath, bool loop)
+    {
+        return new Media(App.LibVlc, mediaPath, options: loop ? "input-repeat=65535" : string.Empty);
+    }
+
+    private uint VideoFormat(ref IntPtr opaque, IntPtr chroma, ref uint width, ref uint height, ref uint pitches, ref uint lines)
     {
         SetVideoFormat(chroma, width, height, ref pitches, ref lines);
         AllocateVideoBuffer();
         CreateBitmap(width, height);
-        
         return 1;
     }
 
@@ -136,23 +113,19 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     {
         ArgumentOutOfRangeException.ThrowIfNegative(lines);
         ArgumentOutOfRangeException.ThrowIfNegative(pitches);
-        // Use RV32 (BGRA) format - native to Avalonia for optimal quality
         Marshal.Copy("RV32"u8.ToArray(), 0, chroma, 4);
-        
         _videoHeight = height;
-        _videoPitch = width * 4; // 4 bytes per pixel (BGRA)
-        
+        _videoPitch = width * 4;
         pitches = _videoPitch;
         lines = height;
     }
 
     private void AllocateVideoBuffer()
     {
-        var bufferSize = GetBufferSize();
         lock (_bufferLock)
         {
             FreeVideoBuffer();
-            _videoBuffer = Marshal.AllocHGlobal(bufferSize);
+            _videoBuffer = Marshal.AllocHGlobal(GetBufferSize());
         }
     }
 
@@ -180,7 +153,6 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     private void DisplayVideo(IntPtr opaque, IntPtr picture)
     {
         if (!IsVideoReady()) return;
-
         var frameData = CopyFrameData();
         UpdateFrameOnUiThread(frameData);
     }
@@ -192,15 +164,8 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
             FreeVideoBuffer();
         }
     }
-    
-    #endregion
 
-    #region Frame Processing
-    
-    private bool IsVideoReady()
-    {
-        return CurrentFrame != null && _videoBuffer != IntPtr.Zero;
-    }
+    private bool IsVideoReady() => CurrentFrame != null && _videoBuffer != IntPtr.Zero;
 
     private IntPtr CopyFrameData()
     {
@@ -257,15 +222,8 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
         }
         CurrentFrame = bitmap;
     }
-    
-    #endregion
 
-    #region Helper Methods
-    
-    private int GetBufferSize()
-    {
-        return (int)(_videoPitch * _videoHeight);
-    }
+    private int GetBufferSize() => (int)(_videoPitch * _videoHeight);
 
     private void FreeVideoBuffer()
     {
@@ -280,11 +238,14 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-    
-    #endregion
 
-    #region Disposal
-    
+    private void EnsureNotDisposed()
+    {
+        if (_isDisposed)
+            throw new ObjectDisposedException(nameof(MediaFramePlayer));
+    }
+
+    // Disposal
     public void Dispose()
     {
         if (_isDisposed) return;
@@ -297,6 +258,4 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
         _isDisposed = true;
         GC.SuppressFinalize(this);
     }
-    
-    #endregion
 }
