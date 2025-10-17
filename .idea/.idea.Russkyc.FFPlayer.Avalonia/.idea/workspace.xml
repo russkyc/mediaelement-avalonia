@@ -9,9 +9,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d7436a9b-7e69-473a-b90b-d83d4305948f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Russkyc.FFPlayer.Avalonia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Russkyc.FFPlayer.Avalonia/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Russkyc.MediaElement/MediaFramePlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Russkyc.MediaElement/MediaFramePlayer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sample/MainViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sample/MainViewModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sample/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/Sample/MainWindow.axaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,6 +38,7 @@
     <setting file="mock://C:/Users/russkyc/RiderProjects/Russkyc.FFPlayer.Avalonia/Sample/MainViewModel.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Users/russkyc/RiderProjects/Russkyc.FFPlayer.Avalonia/Sample/MainViewModel.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Sample/MainWindow.axaml" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/russkyc/RiderProjects/Russkyc.FFPlayer.Avalonia/Sample/MainWindow.axaml" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Users/russkyc/RiderProjects/Russkyc.FFPlayer.Avalonia/Sample/MainWindow.axaml" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Sample/MainWindow.axaml.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock://C:/Users/russkyc/RiderProjects/Russkyc.FFPlayer.Avalonia/Sample/MediaFramePlayer.cs" root0="SKIP_HIGHLIGHTING" />
@@ -122,7 +122,7 @@
       <workItem from="1760625757190" duration="3157000" />
       <workItem from="1760629158598" duration="5463000" />
       <workItem from="1760641407299" duration="1165000" />
-      <workItem from="1760672916480" duration="15629000" />
+      <workItem from="1760672916480" duration="16442000" />
     </task>
     <task id="LOCAL-00001" summary=":tada: Initial commit">
       <option name="closed" value="true" />
@@ -204,7 +204,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760690476484</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary=":recycle: Enhance MainWindow UI with slider for playback progress and update MediaFramePlayer for duration handling">
+      <option name="closed" value="true" />
+      <created>1760692219278</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1760692219278</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -235,7 +243,8 @@
     <MESSAGE value=":recycle: Add timestamp binding and event handling for media playback updates" />
     <MESSAGE value=":recycle: Integrate MediaFramePlayer into Russkyc.MediaElement and enhance playback controls in MainWindow" />
     <MESSAGE value=":recycle: Rename solution file from Russkyc.FFPlayer.Avalonia.sln to Russkyc.MediaElement.Avalonia.sln" />
-    <option name="LAST_COMMIT_MESSAGE" value=":recycle: Rename solution file from Russkyc.FFPlayer.Avalonia.sln to Russkyc.MediaElement.Avalonia.sln" />
+    <MESSAGE value=":recycle: Enhance MainWindow UI with slider for playback progress and update MediaFramePlayer for duration handling" />
+    <option name="LAST_COMMIT_MESSAGE" value=":recycle: Enhance MainWindow UI with slider for playback progress and update MediaFramePlayer for duration handling" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

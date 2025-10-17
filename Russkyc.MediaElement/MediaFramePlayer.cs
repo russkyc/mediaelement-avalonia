@@ -11,7 +11,6 @@ namespace Russkyc.MediaElement
 {
     public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     {
-        // Fields
         private readonly LibVLC _libVlc;
         private readonly MediaPlayer _player;
         private readonly object _bufferLock = new object();
@@ -39,7 +38,6 @@ namespace Russkyc.MediaElement
             }
         }
 
-        // New event for timestamp updates
         public event EventHandler<TimeSpan>? OnPlay;
 
         public void ClearPlayingHandlers()
@@ -47,11 +45,10 @@ namespace Russkyc.MediaElement
             OnPlay = null;
         }
 
-        // Method to trigger the Playing event with trimmed milliseconds
         private void OnPlaying(TimeSpan timestamp)
         {
             var trimmedTimestamp = new TimeSpan(timestamp.Hours, timestamp.Minutes, timestamp.Seconds);
-            CurrentTimestamp = timestamp; // Update CurrentTimestamp here
+            CurrentTimestamp = timestamp; // Trim milliseconds, only hours, minutes, seconds
             OnPlay?.Invoke(this, trimmedTimestamp);
         }
 
@@ -82,11 +79,9 @@ namespace Russkyc.MediaElement
 
         public double CurrentPercent => Duration.TotalSeconds > 0 ? (CurrentTimestamp.TotalSeconds / Duration.TotalSeconds) * 100 : 0;
 
-        // Events
         public event PropertyChangedEventHandler? PropertyChanged;
         public event EventHandler? MediaPlayerStarted;
 
-        // Constructor
         public MediaFramePlayer(LibVLC libVlc)
         {
             _libVlc = libVlc;
@@ -100,33 +95,28 @@ namespace Russkyc.MediaElement
             Dispose();
         }
 
-        // Public Methods
         public void Load(string mediaPath, bool loop = false)
         {
-            if (IsPlaying) return;
-            if (_isDisposed) return;
-            _loop = loop;
-            _mediaPath = mediaPath;
-            var media = new Media(_libVlc, _mediaPath, options: _loop ? "input-repeat=65535" : string.Empty);
-
-            media.ParsedChanged += (sender, args) =>
-            {
-                if (args.ParsedStatus == MediaParsedStatus.Done)
-                {
-                    Duration = TimeSpan.FromMilliseconds(media.Duration);
-                }
-            };
-
-            media.Parse(); // Trigger metadata parsing
-            _player.Play(media);
-            IsPlaying = true;
-            OnPropertyChanged(nameof(IsPlaying));
+            if (IsPlaying || _isDisposed) return;
+            InitializeMedia(mediaPath, loop);
         }
-        // Public Methods
+
         public void Play(string mediaPath, bool loop = false)
         {
-            if (IsPlaying) return;
-            if (_isDisposed) return;
+            if (IsPlaying || _isDisposed) return;
+            InitializeMedia(mediaPath, loop);
+        }
+
+        public void Play()
+        {
+            if (IsPlaying || _isDisposed || _mediaPath is null) return;
+            _player.Pause();
+            IsPlaying = true;
+            OnPropertyChanged(nameof(IsPlaying));
+        }
+
+        private void InitializeMedia(string mediaPath, bool loop)
+        {
             _loop = loop;
             _mediaPath = mediaPath;
             var media = new Media(_libVlc, _mediaPath, options: _loop ? "input-repeat=65535" : string.Empty);
@@ -141,16 +131,6 @@ namespace Russkyc.MediaElement
 
             media.Parse(); // Trigger metadata parsing
             _player.Play(media);
-            IsPlaying = true;
-            OnPropertyChanged(nameof(IsPlaying));
-        }
-        public void Play(bool loop = false)
-        {
-            if (IsPlaying) return;
-            if (_isDisposed) return;
-            if (_mediaPath is null) return;
-            _loop = loop;
-            _player.Pause();
             IsPlaying = true;
             OnPropertyChanged(nameof(IsPlaying));
         }
@@ -197,7 +177,6 @@ namespace Russkyc.MediaElement
             }
         }
 
-        // Private Methods
         private void ConfigureVideoCallbacks()
         {
             _player.SetVideoFormatCallbacks(VideoFormat, CleanupVideo);
@@ -222,13 +201,33 @@ namespace Russkyc.MediaElement
             lines = height;
         }
 
-        private void AllocateVideoBuffer()
+        private void ManageVideoBuffer(Action bufferAction)
         {
             lock (_bufferLock)
             {
+                bufferAction();
+            }
+        }
+
+        private void AllocateVideoBuffer()
+        {
+            ManageVideoBuffer(() =>
+            {
                 FreeVideoBuffer();
                 _videoBuffer = Marshal.AllocHGlobal(GetBufferSize());
-            }
+            });
+        }
+
+        private void FreeVideoBuffer()
+        {
+            ManageVideoBuffer(() =>
+            {
+                if (_videoBuffer != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(_videoBuffer);
+                    _videoBuffer = IntPtr.Zero;
+                }
+            });
         }
 
         private void CreateBitmap(uint width, uint height)
@@ -236,8 +235,8 @@ namespace Russkyc.MediaElement
             // Ensure the bitmap matches the source video resolution
             CurrentFrame = new WriteableBitmap(
                 new Avalonia.PixelSize((int)width, (int)height),
-                new Avalonia.Vector(96, 96), // DPI settings
-                PixelFormat.Bgra8888, // High-quality pixel format
+                new Avalonia.Vector(96, 96), // Dpi, can be adjusted as needed
+                PixelFormat.Bgra8888,
                 AlphaFormat.Opaque);
         }
 
@@ -290,20 +289,28 @@ namespace Russkyc.MediaElement
                     {
                         _isUpdatingFrame = false;
                     }
-                }, DispatcherPriority.Render); // Use Render priority for smoother updates
+                }, DispatcherPriority.Render);
+            }
+        }
+
+        private void ManageReusableFrameBuffer(Action bufferAction)
+        {
+            lock (_frameBufferLock)
+            {
+                bufferAction();
             }
         }
 
         private void FreeReusableFrameBuffer()
         {
-            lock (_frameBufferLock)
+            ManageReusableFrameBuffer(() =>
             {
                 if (_reusableFrameBuffer != IntPtr.Zero)
                 {
                     Marshal.FreeHGlobal(_reusableFrameBuffer);
                     _reusableFrameBuffer = IntPtr.Zero;
                 }
-            }
+            });
         }
 
         private void CleanupVideo(ref IntPtr opaque)
@@ -346,19 +353,11 @@ namespace Russkyc.MediaElement
 
         private int GetBufferSize() => (int)(_videoPitch * _videoHeight);
 
-        private void FreeVideoBuffer()
-        {
-            if (_videoBuffer == IntPtr.Zero) return;
-            Marshal.FreeHGlobal(_videoBuffer);
-            _videoBuffer = IntPtr.Zero;
-        }
-
         private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        // Disposal
         public void Dispose()
         {
             if (_isDisposed) return;
@@ -376,3 +375,4 @@ namespace Russkyc.MediaElement
         }
     }
 }
+
