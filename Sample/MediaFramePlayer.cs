@@ -23,6 +23,9 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     private Thread? _playerThread;
     private string? _mediaPath;
     private ManualResetEventSlim _stopEvent = new();
+    private IntPtr _reusableFrameBuffer;
+    private readonly object _frameBufferLock = new();
+    private bool _isUpdatingFrame;
 
     // Properties
     public WriteableBitmap? CurrentFrame
@@ -161,8 +164,52 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     private void DisplayVideo(IntPtr opaque, IntPtr picture)
     {
         if (!IsVideoReady()) return;
-        var frameData = CopyFrameData();
-        UpdateFrameOnUiThread(frameData);
+
+        lock (_frameBufferLock)
+        {
+            if (_reusableFrameBuffer == IntPtr.Zero)
+            {
+                _reusableFrameBuffer = Marshal.AllocHGlobal(GetBufferSize());
+            }
+
+            unsafe
+            {
+                Buffer.MemoryCopy(
+                    _videoBuffer.ToPointer(),
+                    _reusableFrameBuffer.ToPointer(),
+                    GetBufferSize(),
+                    GetBufferSize());
+            }
+        }
+
+        if (!_isUpdatingFrame)
+        {
+            _isUpdatingFrame = true;
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                try
+                {
+                    CopyFrameToWriteableBitmap(_reusableFrameBuffer);
+                    OnPropertyChanged(nameof(CurrentFrame));
+                }
+                finally
+                {
+                    _isUpdatingFrame = false;
+                }
+            }, DispatcherPriority.Send);
+        }
+    }
+
+    private void FreeReusableFrameBuffer()
+    {
+        lock (_frameBufferLock)
+        {
+            if (_reusableFrameBuffer != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(_reusableFrameBuffer);
+                _reusableFrameBuffer = IntPtr.Zero;
+            }
+        }
     }
 
     private void CleanupVideo(ref IntPtr opaque)
@@ -171,6 +218,7 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
         {
             FreeVideoBuffer();
         }
+        FreeReusableFrameBuffer();
     }
 
     private bool IsVideoReady() => CurrentFrame != null && _videoBuffer != IntPtr.Zero;
