@@ -189,7 +189,11 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
             {
                 try
                 {
-                    CopyFrameToWriteableBitmap(_reusableFrameBuffer);
+                    lock (_frameBufferLock)
+                    {
+                        CopyFrameToWriteableBitmap(_reusableFrameBuffer);
+                    }
+
                     OnPropertyChanged(nameof(CurrentFrame));
                 }
                 finally
@@ -222,40 +226,6 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     }
 
     private bool IsVideoReady() => CurrentFrame != null && _videoBuffer != IntPtr.Zero;
-
-    private IntPtr CopyFrameData()
-    {
-        lock (_bufferLock)
-        {
-            var bufferSize = GetBufferSize();
-            var frameBuffer = Marshal.AllocHGlobal(bufferSize);
-            unsafe
-            {
-                Buffer.MemoryCopy(
-                    _videoBuffer.ToPointer(),
-                    frameBuffer.ToPointer(),
-                    bufferSize,
-                    bufferSize);
-            }
-            return frameBuffer;
-        }
-    }
-
-    private void UpdateFrameOnUiThread(IntPtr frameBuffer)
-    {
-        Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            try
-            {
-                CopyFrameToWriteableBitmap(frameBuffer);
-                OnPropertyChanged(nameof(CurrentFrame));
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(frameBuffer);
-            }
-        }, DispatcherPriority.Send);
-    }
 
     private void CopyFrameToWriteableBitmap(IntPtr sourceBuffer)
     {
