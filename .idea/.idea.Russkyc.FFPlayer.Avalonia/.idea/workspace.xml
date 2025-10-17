@@ -10,8 +10,9 @@
   <component name="ChangeListManager">
     <list default="true" id="d7436a9b-7e69-473a-b90b-d83d4305948f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Russkyc.FFPlayer.Avalonia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Russkyc.FFPlayer.Avalonia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Russkyc.MediaElement.Avalonia.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Russkyc.MediaElement.Avalonia.sln.DotSettings.user" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Russkyc.MediaElement/MediaFramePlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Russkyc.MediaElement/MediaFramePlayer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sample/MainViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sample/MainViewModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sample/MainWindow.axaml" beforeDir="false" afterPath="$PROJECT_DIR$/Sample/MainWindow.axaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,7 +127,7 @@
       <workItem from="1760625757190" duration="3157000" />
       <workItem from="1760629158598" duration="5463000" />
       <workItem from="1760641407299" duration="1165000" />
-      <workItem from="1760672916480" duration="19259000" />
+      <workItem from="1760672916480" duration="19917000" />
     </task>
     <task id="LOCAL-00001" summary=":tada: Initial commit">
       <option name="closed" value="true" />
@@ -224,7 +225,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760693053582</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary=":recycle: Update MediaFramePlayer to handle playback completion and improve event handling">
+      <option name="closed" value="true" />
+      <created>1760695769774</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1760695769774</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -257,7 +266,8 @@
     <MESSAGE value=":recycle: Rename solution file from Russkyc.FFPlayer.Avalonia.sln to Russkyc.MediaElement.Avalonia.sln" />
     <MESSAGE value=":recycle: Enhance MainWindow UI with slider for playback progress and update MediaFramePlayer for duration handling" />
     <MESSAGE value=":recycle: Refactor MediaFramePlayer for improved event handling and buffer management" />
-    <option name="LAST_COMMIT_MESSAGE" value=":recycle: Refactor MediaFramePlayer for improved event handling and buffer management" />
+    <MESSAGE value=":recycle: Update MediaFramePlayer to handle playback completion and improve event handling" />
+    <option name="LAST_COMMIT_MESSAGE" value=":recycle: Update MediaFramePlayer to handle playback completion and improve event handling" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

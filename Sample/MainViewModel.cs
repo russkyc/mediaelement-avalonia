@@ -13,6 +13,7 @@ public partial class MainViewModel : ObservableObject
 {
     [ObservableProperty] private int _index;
     [ObservableProperty] private MediaFramePlayer? _framePlayer;
+    [ObservableProperty] private string _playPauseText = "Pause";
 
     public MainViewModel()
     {
@@ -30,12 +31,13 @@ public partial class MainViewModel : ObservableObject
         if (FramePlayer is null) return;
         if (FramePlayer.IsPlaying)
         {
-            FramePlayer?.Pause();
+            FramePlayer.Pause();
         }
         else
         {
-            FramePlayer?.Play();
+            FramePlayer.Play();
         }
+        PlayPauseText = FramePlayer.IsPlaying ? "Pause" : "Play";
     }
 
     [RelayCommand]
@@ -52,7 +54,9 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void Stop()
     {
-        FramePlayer?.Stop();
+        if (FramePlayer is null) return;
+        FramePlayer.Stop();
+        PlayPauseText = FramePlayer.IsPlaying ? "Pause" : "Play";
     }
 
     private void OnSwitch()
@@ -68,6 +72,8 @@ public partial class MainViewModel : ObservableObject
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
                         FramePlayer = framePlayer;
+                        PlayPauseText = framePlayer.IsPlaying ? "Pause" : "Play";
+                        FramePlayer.OnEnd += (sender, args) => PlayPauseText = framePlayer.IsPlaying ? "Pause" : "Play";
                         Index = 1;
                     });
                 };
@@ -84,6 +90,8 @@ public partial class MainViewModel : ObservableObject
                     Dispatcher.UIThread.InvokeAsync(() =>
                     {
                         FramePlayer = framePlayer;
+                        PlayPauseText = framePlayer.IsPlaying ? "Pause" : "Play";
+                        FramePlayer.OnEnd += (sender, args) => PlayPauseText = framePlayer.IsPlaying ? "Pause" : "Play";
                         Index = 0;
                     });
                 };

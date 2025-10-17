@@ -39,10 +39,12 @@ namespace Russkyc.MediaElement
         }
 
         public event EventHandler<TimeSpan>? OnPlay;
+        public event EventHandler? OnEnd;
 
         public void ClearPlayingHandlers()
         {
             OnPlay = null;
+            OnEnd = null;
         }
 
         private void OnPlaying(TimeSpan timestamp)
@@ -50,10 +52,9 @@ namespace Russkyc.MediaElement
             var trimmedTimestamp = new TimeSpan(timestamp.Hours, timestamp.Minutes, timestamp.Seconds);
             CurrentTimestamp = timestamp; // Trim milliseconds, only hours, minutes, seconds
             OnPlay?.Invoke(this, trimmedTimestamp);
-            if (timestamp.Equals(Duration) && !_loop)
-            {
-                Pause();
-            }
+            if (!timestamp.Equals(Duration) || _loop) return;
+            OnEnd?.Invoke(this, EventArgs.Empty);
+            Pause();
         }
 
         private TimeSpan _duration;
@@ -151,17 +152,18 @@ namespace Russkyc.MediaElement
         public void Stop()
         {
             if (!IsPlaying) return;
+            IsPlaying = false;
             _player.Pause();
             _player.SeekTo(TimeSpan.Zero);
-            IsPlaying = false;
+            OnPlaying(TimeSpan.Zero);
             OnPropertyChanged(nameof(IsPlaying));
         }
 
         public void Pause()
         {
             if (!IsPlaying) return;
-            _player.Pause();
             IsPlaying = false;
+            _player.Pause();
             OnPropertyChanged(nameof(IsPlaying));
         }
 
