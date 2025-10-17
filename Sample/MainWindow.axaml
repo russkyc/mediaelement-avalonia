@@ -3,6 +3,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sample="clr-namespace:Sample"
+        xmlns:mediaElement="clr-namespace:Russkyc.MediaElement;assembly=Russkyc.MediaElement"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Sample.MainWindow"
         x:DataType="sample:MainViewModel"
@@ -11,18 +13,26 @@
         <Viewbox>
             <TransitioningContentControl Content="{Binding FramePlayer}">
                 <TransitioningContentControl.PageTransition>
-                    <CrossFade Duration="0:0:4"/>
+                    <CrossFade Duration="0:0:4" />
                 </TransitioningContentControl.PageTransition>
                 <TransitioningContentControl.ContentTemplate>
-                    <DataTemplate DataType="sample:MediaFramePlayer">
-                        <Image Width="1920" Height="1080" Source="{Binding CurrentFrame, Priority=Animation}"
-                               VerticalAlignment="Stretch" HorizontalAlignment="Stretch" UseLayoutRounding="True"
-                               RenderOptions.BitmapInterpolationMode="HighQuality" />
+                    <DataTemplate DataType="mediaElement:MediaFramePlayer">
+                        <Image Width="1920" Source="{Binding CurrentFrame, Priority=Animation}"
+                               RenderOptions.BitmapInterpolationMode="HighQuality" BlendMode="Difference" />
                     </DataTemplate>
                 </TransitioningContentControl.ContentTemplate>
             </TransitioningContentControl>
         </Viewbox>
-        <TextBlock Text="{Binding FramePlayer.CurrentTimestamp}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"
+        <TextBlock Text="{Binding FramePlayer.IsPlaying}" VerticalAlignment="Center"
+                   HorizontalAlignment="Center" FontWeight="Bold"
                    Foreground="White" FontSize="64" />
+        <Border VerticalAlignment="Bottom" Background="#34000000" HorizontalAlignment="Stretch">
+            <StackPanel Margin="12" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="7">
+                <Button Command="{Binding SeekLess10Command}" Content="-10"/>
+                <Button Command="{Binding PlayPauseCommand}" Content="Play/Pause"/>
+                <Button Command="{Binding StopCommand}" Content="Stop"/>
+                <Button Command="{Binding SeekAdd10Command}" Content="+10"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

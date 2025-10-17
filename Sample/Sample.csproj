@@ -21,19 +21,19 @@
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="fluentscheduler" Version="5.5.3" />
-        <PackageReference Include="LibVLCSharp" Version="3.9.4" />
         <PackageReference Include="VideoLAN.LibVLC.Windows.GPL" Version="3.0.21" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="video.mp4">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="1.mp4">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="2.mp4">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Russkyc.MediaElement\Russkyc.MediaElement.csproj" />
     </ItemGroup>
 </Project>
