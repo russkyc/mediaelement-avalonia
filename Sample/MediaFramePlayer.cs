@@ -22,9 +22,9 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     private bool _isDisposed;
     private Thread? _playerThread;
     private string? _mediaPath;
-    private ManualResetEventSlim _stopEvent = new();
+    private readonly ManualResetEventSlim _stopEvent = new();
     private IntPtr _reusableFrameBuffer;
-    private readonly object _frameBufferLock = new();
+    private readonly Lock _frameBufferLock = new();
     private bool _isUpdatingFrame;
 
     // Properties

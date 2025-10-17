@@ -12,7 +12,7 @@ public partial class MainViewModel : ObservableObject
 
     public MainViewModel()
     {
-        JobManager.AddJob(OnSwitch, s => s.ToRunNow().AndEvery(10).Seconds());
+        JobManager.AddJob(OnSwitch, s => s.ToRunEvery(10).Seconds());
     }
 
     partial void OnFramePlayerChanged(MediaFramePlayer? oldValue, MediaFramePlayer? newValue)
