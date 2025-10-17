@@ -27,11 +27,14 @@
                    HorizontalAlignment="Center" FontWeight="Bold"
                    Foreground="White" FontSize="64" />
         <Border VerticalAlignment="Bottom" Background="#34000000" HorizontalAlignment="Stretch">
-            <StackPanel Margin="12" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="7">
-                <Button Command="{Binding SeekLess10Command}" Content="-10"/>
-                <Button Command="{Binding PlayPauseCommand}" Content="Play/Pause"/>
-                <Button Command="{Binding StopCommand}" Content="Stop"/>
-                <Button Command="{Binding SeekAdd10Command}" Content="+10"/>
+            <StackPanel>
+                <Slider Value="{Binding FramePlayer.CurrentPercent}" Minimum="0" Maximum="100"></Slider>
+                <StackPanel Margin="12" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="7">
+                    <Button Command="{Binding SeekLess10Command}" Content="-10"/>
+                    <Button Command="{Binding PlayPauseCommand}" Content="Play/Pause"/>
+                    <Button Command="{Binding StopCommand}" Content="Stop"/>
+                    <Button Command="{Binding SeekAdd10Command}" Content="+10"/>
+                </StackPanel>
             </StackPanel>
         </Border>
     </Grid>

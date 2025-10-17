@@ -51,23 +51,36 @@ namespace Russkyc.MediaElement
         private void OnPlaying(TimeSpan timestamp)
         {
             var trimmedTimestamp = new TimeSpan(timestamp.Hours, timestamp.Minutes, timestamp.Seconds);
-            OnPropertyChanged(nameof(CurrentTimestamp));
+            CurrentTimestamp = timestamp; // Update CurrentTimestamp here
             OnPlay?.Invoke(this, trimmedTimestamp);
+        }
+
+        private TimeSpan _duration;
+        private TimeSpan _currentTimestamp;
+
+        public TimeSpan Duration
+        {
+            get => _duration;
+            set
+            {
+                _duration = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CurrentPercent));
+            }
         }
 
         public TimeSpan CurrentTimestamp
         {
-            get
-            {
-                var timestamp = TimeSpan.FromMilliseconds(_player.Time);
-                return new TimeSpan(timestamp.Hours, timestamp.Minutes, timestamp.Seconds);
-            }
+            get => _currentTimestamp;
             set
             {
-                _player.Time = (long)value.TotalMilliseconds;
-                OnPlaying(TimeSpan.FromMilliseconds(_player.Time));
+                _currentTimestamp = TimeSpan.FromSeconds(Math.Clamp(value.TotalSeconds, 0, Duration.TotalSeconds));
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(CurrentPercent));
             }
         }
+
+        public double CurrentPercent => Duration.TotalSeconds > 0 ? (CurrentTimestamp.TotalSeconds / Duration.TotalSeconds) * 100 : 0;
 
         // Events
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -95,6 +108,16 @@ namespace Russkyc.MediaElement
             _loop = loop;
             _mediaPath = mediaPath;
             var media = new Media(_libVlc, _mediaPath, options: _loop ? "input-repeat=65535" : string.Empty);
+
+            media.ParsedChanged += (sender, args) =>
+            {
+                if (args.ParsedStatus == MediaParsedStatus.Done)
+                {
+                    Duration = TimeSpan.FromMilliseconds(media.Duration);
+                }
+            };
+
+            media.Parse(); // Trigger metadata parsing
             _player.Play(media);
             IsPlaying = true;
             OnPropertyChanged(nameof(IsPlaying));
@@ -107,6 +130,16 @@ namespace Russkyc.MediaElement
             _loop = loop;
             _mediaPath = mediaPath;
             var media = new Media(_libVlc, _mediaPath, options: _loop ? "input-repeat=65535" : string.Empty);
+
+            media.ParsedChanged += (sender, args) =>
+            {
+                if (args.ParsedStatus == MediaParsedStatus.Done)
+                {
+                    Duration = TimeSpan.FromMilliseconds(media.Duration);
+                }
+            };
+
+            media.Parse(); // Trigger metadata parsing
             _player.Play(media);
             IsPlaying = true;
             OnPropertyChanged(nameof(IsPlaying));
@@ -154,7 +187,9 @@ namespace Russkyc.MediaElement
             if (_player.Time == 0) return;
             try
             {
-                _player.Time = (long)position.TotalMilliseconds;
+                var clampedPosition = TimeSpan.FromSeconds(Math.Clamp(position.TotalSeconds, 0, Duration.TotalSeconds));
+                _player.Time = (long)clampedPosition.TotalMilliseconds;
+                OnPlaying(clampedPosition);
             }
             catch (Exception)
             {
