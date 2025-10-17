@@ -39,6 +39,36 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
         }
     }
 
+    // New event for timestamp updates
+    public event EventHandler<TimeSpan>? Playing;
+
+    public void ClearPlayingHandlers()
+    {
+        Playing = null;
+    }
+
+    // Method to trigger the Playing event with trimmed milliseconds
+    private void OnPlaying(TimeSpan timestamp)
+    {
+        var trimmedTimestamp = new TimeSpan(timestamp.Hours, timestamp.Minutes, timestamp.Seconds);
+        OnPropertyChanged(nameof(CurrentTimestamp));
+        Playing?.Invoke(this, trimmedTimestamp);
+    }
+
+    public TimeSpan CurrentTimestamp
+    {
+        get
+        {
+            var timestamp = TimeSpan.FromMilliseconds(_player.Time);
+            return new TimeSpan(timestamp.Hours, timestamp.Minutes, timestamp.Seconds);
+        }
+        set
+        {
+            _player.Time = (long)value.TotalMilliseconds;
+            OnPlaying(TimeSpan.FromMilliseconds(_player.Time));
+        }
+    }
+
     // Events
     public event PropertyChangedEventHandler? PropertyChanged;
     public event EventHandler? MediaPlayerStarted;
@@ -47,6 +77,7 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     public MediaFramePlayer()
     {
         _player = new MediaPlayer(App.LibVlc);
+        _player.TimeChanged += (sender, args) => { OnPlaying(TimeSpan.FromMilliseconds(args.Time)); };
         ConfigureVideoCallbacks();
     }
 
@@ -92,6 +123,12 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
         _playerThread?.Join();
     }
 
+    public void Seek(TimeSpan position)
+    {
+        EnsureNotDisposed();
+        _player.Time = (long)position.TotalMilliseconds;
+    }
+
     // Private Methods
     private void ConfigureVideoCallbacks()
     {
@@ -115,7 +152,8 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
         return new Media(App.LibVlc, mediaPath, options: loop ? "input-repeat=65535" : string.Empty);
     }
 
-    private uint VideoFormat(ref IntPtr opaque, IntPtr chroma, ref uint width, ref uint height, ref uint pitches, ref uint lines)
+    private uint VideoFormat(ref IntPtr opaque, IntPtr chroma, ref uint width, ref uint height, ref uint pitches,
+        ref uint lines)
     {
         SetVideoFormat(chroma, width, height, ref pitches, ref lines);
         AllocateVideoBuffer();
@@ -158,6 +196,7 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
         {
             Marshal.WriteIntPtr(planes, _videoBuffer);
         }
+
         return IntPtr.Zero;
     }
 
@@ -222,6 +261,7 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
         {
             FreeVideoBuffer();
         }
+
         FreeReusableFrameBuffer();
     }
 
@@ -246,6 +286,7 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
                 bufferSize,
                 bufferSize);
         }
+
         CurrentFrame = bitmap;
     }
 
@@ -276,11 +317,13 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
     {
         if (_isDisposed) return;
         StopThreaded();
+        ClearPlayingHandlers();
         _player.Dispose();
         lock (_bufferLock)
         {
             FreeVideoBuffer();
         }
+
         _isDisposed = true;
         GC.SuppressFinalize(this);
     }

@@ -22,7 +22,7 @@
                 </TransitioningContentControl.ContentTemplate>
             </TransitioningContentControl>
         </Viewbox>
-        <TextBlock Text="Test Overlay" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"
+        <TextBlock Text="{Binding FramePlayer.CurrentTimestamp}" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"
                    Foreground="White" FontSize="64" />
     </Grid>
 </Window>
