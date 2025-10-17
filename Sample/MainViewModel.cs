@@ -26,15 +26,21 @@ public partial class MainViewModel : ObservableObject
         {
             var framePlayer = new MediaFramePlayer();
             framePlayer.PlayOnThread(Path.Combine(Environment.CurrentDirectory, "1.mp4"));
-            FramePlayer = framePlayer;
-            Index = 1;
+            framePlayer.MediaPlayerStarted += (sender, args) =>
+            {
+                FramePlayer = framePlayer;
+                Index = 1;
+            };
         }
         else
         {
             var framePlayer = new MediaFramePlayer();
             framePlayer.PlayOnThread(Path.Combine(Environment.CurrentDirectory, "2.mp4"));
-            FramePlayer = framePlayer;
-            Index = 0;
+            framePlayer.MediaPlayerStarted += (sender, args) =>
+            {
+                FramePlayer = framePlayer;
+                Index = 0;
+            };
         }
     }
 }

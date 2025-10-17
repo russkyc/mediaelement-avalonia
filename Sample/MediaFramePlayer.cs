@@ -32,11 +32,13 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
         {
             _currentFrame = value;
             OnPropertyChanged();
+            OnMediaPlayerStarted();
         }
     }
 
     // Events
     public event PropertyChangedEventHandler? PropertyChanged;
+    public event EventHandler? MediaPlayerStarted;
 
     // Constructor
     public MediaFramePlayer()
@@ -56,6 +58,15 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
         EnsureNotDisposed();
         var media = CreateMedia(mediaPath, loop);
         _player.Play(media);
+    }
+
+    private void OnMediaPlayerStarted()
+    {
+        if (CurrentFrame != null)
+        {
+            MediaPlayerStarted?.Invoke(this, EventArgs.Empty);
+            MediaPlayerStarted = null;
+        }
     }
 
     public void Stop() => _player.Stop();
@@ -131,14 +142,11 @@ public sealed class MediaFramePlayer : INotifyPropertyChanged, IDisposable
 
     private void CreateBitmap(uint width, uint height)
     {
-        Dispatcher.UIThread.InvokeAsync(() =>
-        {
-            CurrentFrame = new WriteableBitmap(
-                new Avalonia.PixelSize((int)width, (int)height),
-                new Avalonia.Vector(96, 96),
-                PixelFormat.Bgra8888,
-                AlphaFormat.Opaque);
-        }).Wait();
+        CurrentFrame = new WriteableBitmap(
+            new Avalonia.PixelSize((int)width, (int)height),
+            new Avalonia.Vector(96, 96),
+            PixelFormat.Bgra8888,
+            AlphaFormat.Opaque);
     }
 
     private IntPtr LockVideo(IntPtr opaque, IntPtr planes)
