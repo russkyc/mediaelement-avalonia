@@ -50,6 +50,10 @@ namespace Russkyc.MediaElement
             var trimmedTimestamp = new TimeSpan(timestamp.Hours, timestamp.Minutes, timestamp.Seconds);
             CurrentTimestamp = timestamp; // Trim milliseconds, only hours, minutes, seconds
             OnPlay?.Invoke(this, trimmedTimestamp);
+            if (timestamp.Equals(Duration) && !_loop)
+            {
+                Pause();
+            }
         }
 
         private TimeSpan _duration;
@@ -86,7 +90,7 @@ namespace Russkyc.MediaElement
         {
             _libVlc = libVlc;
             _player = new MediaPlayer(_libVlc);
-            _player.TimeChanged += (_, args) => { OnPlaying(TimeSpan.FromMilliseconds(args.Time)); };
+            _player.TimeChanged += (_, args) => OnPlaying(TimeSpan.FromMilliseconds(args.Time));
             ConfigureVideoCallbacks();
         }
 
@@ -119,7 +123,7 @@ namespace Russkyc.MediaElement
         {
             _loop = loop;
             _mediaPath = mediaPath;
-            var media = new Media(_libVlc, _mediaPath, options: _loop ? "input-repeat=65535" : string.Empty);
+            var media = new Media(_libVlc, _mediaPath, options: "input-repeat=65535");
 
             media.ParsedChanged += (sender, args) =>
             {

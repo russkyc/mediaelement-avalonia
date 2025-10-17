@@ -10,6 +10,7 @@
   <component name="ChangeListManager">
     <list default="true" id="d7436a9b-7e69-473a-b90b-d83d4305948f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Russkyc.FFPlayer.Avalonia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Russkyc.FFPlayer.Avalonia/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Russkyc.MediaElement.Avalonia.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Russkyc.MediaElement.Avalonia.sln.DotSettings.user" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Russkyc.MediaElement/MediaFramePlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Russkyc.MediaElement/MediaFramePlayer.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -25,6 +26,7 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/034723e6243c462db592e8fda71104dc3c00/df/0f987498/AppBuilderDesktopExtensions.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/24e01971b5e249909e4066d3a2df4f3938000/ff/c7d0848d/MediaPlayer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/337a4526330444d6aa12d28a85894b2c14400/27/3c9c6606/RendererOptions.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3f466bf025204f6aa7e65dc4cc9705924600/8a/34b03604/ProcessArguments.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/f8d3871629d64ad1a5233d5f5d2a93ad38000/1d/35b97165/LibVLC.cs" root0="FORCE_HIGHLIGHTING" />
@@ -33,6 +35,8 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/fe5a270c472f469a99d8b8b694a7c0821b6928/00/ce9af8f3/ThrowHelper.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6169f1bb3c3c365c1f886cb89adaa3d156367d5b9d3e238bb46901cffce27/SpanHelpers.ByteMemOps.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ad7a6292d43cccb3c89043b164509c97603cbe46b07c2115edc9fae5c6eb8e/Thread.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/russkyc/RiderProjects/Russkyc.FFPlayer.Avalonia/Russkyc.MediaElement/MediaFramePlayer.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/russkyc/RiderProjects/Russkyc.FFPlayer.Avalonia/Russkyc.MediaElement/MediaFramePlayer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Sample/MainViewModel.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="mock://C:/Users/russkyc/RiderProjects/Russkyc.FFPlayer.Avalonia/Sample/MainViewModel.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Users/russkyc/RiderProjects/Russkyc.FFPlayer.Avalonia/Sample/MainViewModel.cs" root0="SKIP_HIGHLIGHTING" />
@@ -122,7 +126,7 @@
       <workItem from="1760625757190" duration="3157000" />
       <workItem from="1760629158598" duration="5463000" />
       <workItem from="1760641407299" duration="1165000" />
-      <workItem from="1760672916480" duration="16442000" />
+      <workItem from="1760672916480" duration="19259000" />
     </task>
     <task id="LOCAL-00001" summary=":tada: Initial commit">
       <option name="closed" value="true" />
@@ -212,7 +216,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760692219278</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary=":recycle: Refactor MediaFramePlayer for improved event handling and buffer management">
+      <option name="closed" value="true" />
+      <created>1760693053582</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1760693053582</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -244,7 +256,8 @@
     <MESSAGE value=":recycle: Integrate MediaFramePlayer into Russkyc.MediaElement and enhance playback controls in MainWindow" />
     <MESSAGE value=":recycle: Rename solution file from Russkyc.FFPlayer.Avalonia.sln to Russkyc.MediaElement.Avalonia.sln" />
     <MESSAGE value=":recycle: Enhance MainWindow UI with slider for playback progress and update MediaFramePlayer for duration handling" />
-    <option name="LAST_COMMIT_MESSAGE" value=":recycle: Enhance MainWindow UI with slider for playback progress and update MediaFramePlayer for duration handling" />
+    <MESSAGE value=":recycle: Refactor MediaFramePlayer for improved event handling and buffer management" />
+    <option name="LAST_COMMIT_MESSAGE" value=":recycle: Refactor MediaFramePlayer for improved event handling and buffer management" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
